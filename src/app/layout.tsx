@@ -4,7 +4,7 @@ import { cn } from '@/lib/utils'
 import { Toaster } from '@/components/ui/toaster'
 
 export const metadata: Metadata = {
-  title: 'Kindred Journey',
+  title: 'FertiTrack',
   description:
     'An empathetic and discreet support app for couples navigating infertility.',
 }

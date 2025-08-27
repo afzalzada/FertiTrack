@@ -27,7 +27,7 @@ const DashboardPage = () => {
       <div className="flex-1 space-y-8 p-4 md:p-8">
         <div className="space-y-2">
           <h1 className="text-4xl font-headline font-bold tracking-tight">
-            Welcome to Kindred Journey
+            Welcome to FertiTrack
           </h1>
           <p className="text-muted-foreground">
             A gentle space for your journey. Here are some tools to support you
