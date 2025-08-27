@@ -1,6 +1,7 @@
 'use client'
 
 import Link from 'next/link'
+import { useRouter } from 'next/navigation'
 import { usePathname } from 'next/navigation'
 import type { ReactNode } from 'react'
 import {
@@ -10,6 +11,7 @@ import {
   HeartPulse,
   LayoutDashboard,
   Leaf,
+  LogOut,
   Sparkles,
   Menu,
   Users,
@@ -22,34 +24,41 @@ import {
 } from '@/components/ui/sheet'
 import { Button } from '@/components/ui/button'
 import { ScrollArea } from '@/components/ui/scroll-area'
+import { supabase } from '@/lib/supabase'
 
 const navItems = [
-  { href: '/', label: 'Dashboard', icon: LayoutDashboard },
-  { href: '/calendar', label: 'Calendar', icon: CalendarDays },
-  { href: '/journal', label: 'Journal', icon: BookHeart },
-  { href: '/tracker', label: 'Symptom Tracker', icon: HeartPulse },
-  { href: '/mindfulness', label: 'Mindfulness', icon: Leaf },
-  { href: '/resources', label: 'Resources', icon: BookOpen },
-  { href: '/community', label: 'Community', icon: Users },
-  { href: '/support', label: 'AI Support', icon: Sparkles },
+  { href: '/', label: 'Dashboard', icon: LayoutDashboard, color: 'text-sky-500' },
+  { href: '/calendar', label: 'Calendar', icon: CalendarDays, color: 'text-red-500' },
+  { href: '/journal', label: 'Journal', icon: BookHeart, color: 'text-amber-500' },
+  { href: '/tracker', label: 'Symptom Tracker', icon: HeartPulse, color: 'text-rose-500' },
+  { href: '/mindfulness', label: 'Mindfulness', icon: Leaf, color: 'text-green-500' },
+  { href: '/resources', label: 'Resources', icon: BookOpen, color: 'text-blue-500' },
+  { href: '/community', label: 'Community', icon: Users, color: 'text-teal-500' },
+  { href: '/support', label: 'AI Support', icon: Sparkles, color: 'text-indigo-500' },
 ]
 
 export default function AppLayout({ children }: { children: ReactNode }) {
   const pathname = usePathname()
+  const router = useRouter()
+
+  const handleLogout = async () => {
+    await supabase.auth.signOut()
+    router.push('/login')
+  }
 
   const navLinks = (
-    <nav className="grid items-start gap-2 px-4 text-sm font-medium">
-      {navItems.map(({ href, label, icon: Icon }) => (
+     <nav className="grid items-start gap-2 px-4 text-sm font-medium">
+      {navItems.map(({ href, label, icon: Icon, color }) => (
         <Link
           key={href}
           href={href}
-          className={`flex items-center gap-3 rounded-lg px-3 py-2 transition-all hover:text-primary ${
+          className={`flex items-center gap-3 rounded-lg px-3 py-2 transition-all ${
             pathname === href
               ? 'bg-muted text-primary'
-              : 'text-muted-foreground'
+              : 'text-muted-foreground hover:text-primary'
           }`}
         >
-          <Icon className="h-4 w-4" />
+          <Icon className={`h-4 w-4 ${pathname === href ? 'text-primary' : color}`} />
           {label}
         </Link>
       ))}
@@ -64,6 +73,12 @@ export default function AppLayout({ children }: { children: ReactNode }) {
             <Logo />
           </div>
           <ScrollArea className="flex-1 py-4">{navLinks}</ScrollArea>
+           <div className="mt-auto p-4">
+            <Button variant="ghost" className="w-full justify-start" onClick={handleLogout}>
+              <LogOut className="mr-2 h-4 w-4" />
+              Log Out
+            </Button>
+          </div>
         </div>
       </aside>
       <div className="flex flex-col">

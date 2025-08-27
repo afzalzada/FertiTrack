@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from 'react'
 import Link from 'next/link'
+import { useRouter } from 'next/navigation'
 import {
   ArrowRight,
   CalendarDays,
@@ -22,6 +23,7 @@ import {
 } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
+import { supabase } from '@/lib/supabase'
 
 const getGreeting = () => {
   const currentHour = new Date().getHours()
@@ -34,12 +36,20 @@ const getGreeting = () => {
   }
 }
 
-const DashboardPage = () => {
+export default function DashboardPage() {
   const [greeting, setGreeting] = useState('')
+  const router = useRouter()
 
   useEffect(() => {
+    const checkUser = async () => {
+      const { data: { user } } = await supabase.auth.getUser()
+      if (!user) {
+        router.push('/login')
+      }
+    }
+    checkUser()
     setGreeting(getGreeting())
-  }, [])
+  }, [router])
 
   return (
     <AppLayout>
@@ -56,8 +66,8 @@ const DashboardPage = () => {
         <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
           <Card className="flex flex-col">
             <CardHeader className="flex-row items-start gap-4 space-y-0">
-              <div className="rounded-lg bg-primary/10 p-3">
-                <CalendarDays className="h-6 w-6 text-primary" />
+              <div className="rounded-lg bg-red-500/10 p-3">
+                <CalendarDays className="h-6 w-6 text-red-500" />
               </div>
               <div className="flex-1">
                 <CardTitle>Shared Calendar</CardTitle>
@@ -80,8 +90,8 @@ const DashboardPage = () => {
 
           <Card className="flex flex-col">
             <CardHeader className="flex-row items-start gap-4 space-y-0">
-              <div className="rounded-lg bg-accent/20 p-3">
-                <BookHeart className="h-6 w-6 text-accent" />
+              <div className="rounded-lg bg-amber-500/10 p-3">
+                <BookHeart className="h-6 w-6 text-amber-500" />
               </div>
               <div className="flex-1">
                 <CardTitle>Private Journal</CardTitle>
@@ -102,13 +112,13 @@ const DashboardPage = () => {
 
           <Card className="flex flex-col">
             <CardHeader className="flex-row items-start gap-4 space-y-0">
-              <div className="rounded-lg bg-chart-3/10 p-3">
-                <Users className="h-6 w-6 text-chart-3" />
+              <div className="rounded-lg bg-teal-500/10 p-3">
+                <Users className="h-6 w-6 text-teal-500" />
               </div>
               <div className="flex-1">
                 <CardTitle>Community</CardTitle>
                 <CardDescription>
-                  <Badge variant="outline" className="mr-2 border-accent-foreground text-accent-foreground">New</Badge> 
+                  <Badge variant="outline" className="mr-2 border-accent text-accent">New</Badge> 
                   Connect with others
                 </CardDescription>
               </div>
@@ -127,8 +137,8 @@ const DashboardPage = () => {
 
           <Card className="flex flex-col">
             <CardHeader className="flex-row items-start gap-4 space-y-0">
-              <div className="rounded-lg bg-chart-5/10 p-3">
-                <HeartPulse className="h-6 w-6 text-chart-5" />
+              <div className="rounded-lg bg-rose-500/10 p-3">
+                <HeartPulse className="h-6 w-6 text-rose-500" />
               </div>
               <div className="flex-1">
                 <CardTitle>Symptom Tracker</CardTitle>
@@ -149,8 +159,8 @@ const DashboardPage = () => {
 
           <Card className="flex flex-col">
             <CardHeader className="flex-row items-start gap-4 space-y-0">
-              <div className="rounded-lg bg-chart-2/10 p-3">
-                <Leaf className="h-6 w-6 text-chart-2" />
+              <div className="rounded-lg bg-green-500/10 p-3">
+                <Leaf className="h-6 w-6 text-green-500" />
               </div>
               <div className="flex-1">
                 <CardTitle>Mindfulness</CardTitle>
@@ -171,8 +181,8 @@ const DashboardPage = () => {
 
           <Card className="flex flex-col">
             <CardHeader className="flex-row items-start gap-4 space-y-0">
-              <div className="rounded-lg bg-foreground/5 p-3">
-                <Sparkles className="h-6 w-6 text-foreground/80" />
+              <div className="rounded-lg bg-blue-500/10 p-3">
+                <Sparkles className="h-6 w-6 text-blue-500" />
               </div>
               <div className="flex-1">
                 <CardTitle>Resource Library</CardTitle>
@@ -195,5 +205,3 @@ const DashboardPage = () => {
     </AppLayout>
   )
 }
-
-export default DashboardPage
