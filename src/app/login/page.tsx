@@ -16,6 +16,13 @@ import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { Logo } from '@/components/logo'
 import { useToast } from '@/hooks/use-toast'
+import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert"
+import { Terminal } from 'lucide-react'
+
+const isSupabaseConnected =
+  process.env.NEXT_PUBLIC_SUPABASE_URL &&
+  process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY &&
+  !process.env.NEXT_PUBLIC_SUPABASE_URL.includes('dummy')
 
 export default function LoginPage() {
   const [email, setEmail] = useState('')
@@ -53,15 +60,24 @@ export default function LoginPage() {
     <div className="flex min-h-screen items-center justify-center bg-muted/40 p-4">
       <Card className="w-full max-w-sm">
         <CardHeader className="text-center">
-            <div className="mb-4 flex justify-center">
-             <Logo />
-            </div>
+          <div className="mb-4 flex justify-center">
+            <Logo />
+          </div>
           <CardTitle className="text-2xl font-headline">Welcome Back</CardTitle>
           <CardDescription>
             Enter your email below to log in to your account.
           </CardDescription>
         </CardHeader>
         <CardContent>
+          {!isSupabaseConnected && (
+            <Alert className="mb-4">
+              <Terminal className="h-4 w-4" />
+              <AlertTitle>Supabase is not connected.</AlertTitle>
+              <AlertDescription>
+                Please add your Supabase URL and Anon Key to the <code>.env</code> file to enable authentication.
+              </AlertDescription>
+            </Alert>
+          )}
           <form onSubmit={handleLogin} className="space-y-4">
             <div className="space-y-2">
               <Label htmlFor="email">Email</Label>
@@ -72,21 +88,21 @@ export default function LoginPage() {
                 required
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
-                disabled={loading}
+                disabled={loading || !isSupabaseConnected}
               />
             </div>
             <div className="space-y-2">
               <Label htmlFor="password">Password</Label>
-              <Input 
-                id="password" 
-                type="password" 
-                required 
+              <Input
+                id="password"
+                type="password"
+                required
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
-                disabled={loading}
+                disabled={loading || !isSupabaseConnected}
               />
             </div>
-            <Button type="submit" className="w-full" disabled={loading}>
+            <Button type="submit" className="w-full" disabled={loading || !isSupabaseConnected}>
               {loading ? 'Logging in...' : 'Log In'}
             </Button>
           </form>

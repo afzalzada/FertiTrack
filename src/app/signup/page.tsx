@@ -16,6 +16,13 @@ import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { Logo } from '@/components/logo'
 import { useToast } from '@/hooks/use-toast'
+import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert"
+import { Terminal } from 'lucide-react'
+
+const isSupabaseConnected =
+  process.env.NEXT_PUBLIC_SUPABASE_URL &&
+  process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY &&
+  !process.env.NEXT_PUBLIC_SUPABASE_URL.includes('dummy')
 
 export default function SignupPage() {
   const [email, setEmail] = useState('')
@@ -47,7 +54,14 @@ export default function SignupPage() {
         title: 'Check your email',
         description: 'A confirmation link has been sent to your email address.',
       })
-       router.push('/login');
+      router.push('/login')
+    } else {
+       toast({
+        title: 'Sign up successful!',
+        description: 'Redirecting to your dashboard...',
+      })
+      router.push('/')
+      router.refresh()
     }
   }
 
@@ -64,6 +78,15 @@ export default function SignupPage() {
           </CardDescription>
         </CardHeader>
         <CardContent>
+          {!isSupabaseConnected && (
+            <Alert className="mb-4">
+              <Terminal className="h-4 w-4" />
+              <AlertTitle>Supabase is not connected.</AlertTitle>
+              <AlertDescription>
+                Please add your Supabase URL and Anon Key to the <code>.env</code> file to enable authentication.
+              </AlertDescription>
+            </Alert>
+          )}
           <form onSubmit={handleSignup} className="space-y-4">
             <div className="space-y-2">
               <Label htmlFor="email">Email</Label>
@@ -74,7 +97,7 @@ export default function SignupPage() {
                 required
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
-                disabled={loading}
+                disabled={loading || !isSupabaseConnected}
               />
             </div>
             <div className="space-y-2">
@@ -86,11 +109,11 @@ export default function SignupPage() {
                 minLength={6}
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
-                disabled={loading}
+                disabled={loading || !isSupabaseConnected}
                 placeholder="••••••••"
               />
             </div>
-            <Button type="submit" className="w-full" disabled={loading}>
+            <Button type="submit" className="w-full" disabled={loading || !isSupabaseConnected}>
               {loading ? 'Creating account...' : 'Create Account'}
             </Button>
           </form>
