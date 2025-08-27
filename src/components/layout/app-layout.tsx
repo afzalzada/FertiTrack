@@ -15,6 +15,7 @@ import {
   Sparkles,
   Menu,
   Users,
+  Award,
 } from 'lucide-react'
 import { Logo } from '@/components/logo'
 import {
@@ -34,6 +35,7 @@ const navItems = [
   { href: '/mindfulness', label: 'Mindfulness', icon: Leaf, color: 'text-green-500' },
   { href: '/resources', label: 'Resources', icon: BookOpen, color: 'text-blue-500' },
   { href: '/community', label: 'Community', icon: Users, color: 'text-teal-500' },
+  { href: '/stories', label: 'Success Stories', icon: Award, color: 'text-yellow-500' },
   { href: '/support', label: 'AI Support', icon: Sparkles, color: 'text-indigo-500' },
 ]
 

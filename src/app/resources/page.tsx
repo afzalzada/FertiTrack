@@ -4,6 +4,12 @@ import { Button } from '@/components/ui/button'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
 import Image from 'next/image'
 import Link from 'next/link'
+import {
+  Accordion,
+  AccordionContent,
+  AccordionItem,
+  AccordionTrigger,
+} from '@/components/ui/accordion'
 
 const resources = {
   fertility: [
@@ -28,6 +34,29 @@ const resources = {
   ],
 }
 
+const faqs = [
+    {
+      question: "What's the difference between IUI and IVF?",
+      answer: "Intrauterine Insemination (IUI) involves placing sperm directly into the uterus, while In Vitro Fertilization (IVF) involves fertilizing an egg with sperm in a lab and then transferring the embryo to the uterus. IVF is generally more complex and has a higher success rate per cycle."
+    },
+    {
+      question: "How long should we try to conceive naturally before seeking help?",
+      answer: "Most experts recommend seeking a fertility evaluation if you are under 35 and have been trying for one year, or if you are over 35 and have been trying for six months. You should seek help sooner if you have known risk factors like irregular cycles or a history of pelvic inflammatory disease."
+    },
+    {
+      question: "Are fertility treatments painful?",
+      answer: "Discomfort levels vary widely. Some procedures, like blood draws, are minimally uncomfortable. Others, like the egg retrieval in IVF, are done under sedation to minimize pain. Injections can cause some localized soreness. It's very individual, and your care team can help manage any discomfort."
+    },
+    {
+      question: "How can I support my partner through this?",
+      answer: "Communication is key. Ask them what they need, listen without judgment, and attend appointments together. Offer practical support like managing medications or giving injections. Importantly, find ways to connect and enjoy life outside of fertility treatments."
+    },
+    {
+        question: "Does stress impact fertility?",
+        answer: "While severe stress can affect hormones that regulate ovulation, everyday stress is not a direct cause of infertility. However, the fertility journey itself is stressful. Managing stress through therapy, mindfulness, or hobbies is crucial for your overall well-being during this time."
+    }
+]
+
 const ResourceTab = ({ category }: { category: keyof typeof resources }) => (
   <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
     {resources[category].map((item) => (
@@ -51,6 +80,27 @@ const ResourceTab = ({ category }: { category: keyof typeof resources }) => (
   </div>
 )
 
+const FaqTab = () => (
+    <Card>
+        <CardHeader>
+            <CardTitle>Frequently Asked Questions</CardTitle>
+            <CardDescription>Quick answers to common questions about the fertility journey.</CardDescription>
+        </CardHeader>
+        <CardContent>
+            <Accordion type="single" collapsible className="w-full">
+                {faqs.map((faq, index) => (
+                  <AccordionItem value={`item-${index}`} key={index}>
+                    <AccordionTrigger>{faq.question}</AccordionTrigger>
+                    <AccordionContent>
+                      <p className="text-muted-foreground">{faq.answer}</p>
+                    </AccordionContent>
+                  </AccordionItem>
+                ))}
+              </Accordion>
+        </CardContent>
+    </Card>
+)
+
 export default function ResourcesPage() {
   return (
     <AppLayout>
@@ -65,11 +115,12 @@ export default function ResourcesPage() {
         </div>
 
         <Tabs defaultValue="fertility" className="space-y-4">
-          <TabsList className="grid w-full grid-cols-2 md:grid-cols-4 h-auto">
+          <TabsList className="grid w-full grid-cols-2 md:grid-cols-5 h-auto">
             <TabsTrigger value="fertility">Fertility 101</TabsTrigger>
             <TabsTrigger value="treatments">Treatments</TabsTrigger>
             <TabsTrigger value="wellness">Emotional Wellness</TabsTrigger>
             <TabsTrigger value="nutrition">Nutrition</TabsTrigger>
+            <TabsTrigger value="faq">FAQs</TabsTrigger>
           </TabsList>
           <TabsContent value="fertility">
             <ResourceTab category="fertility" />
@@ -82,6 +133,9 @@ export default function ResourcesPage() {
           </TabsContent>
           <TabsContent value="nutrition">
             <ResourceTab category="nutrition" />
+          </TabsContent>
+          <TabsContent value="faq">
+            <FaqTab />
           </TabsContent>
         </Tabs>
       </div>

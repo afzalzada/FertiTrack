@@ -11,6 +11,7 @@ import {
   Leaf,
   Sparkles,
   Users,
+  Award,
 } from 'lucide-react'
 import AppLayout from '@/components/layout/app-layout'
 import {
@@ -62,6 +63,18 @@ export default function DashboardPage() {
     setGreeting(getGreeting())
   }, [router])
 
+  if (!userName) {
+    return (
+      <AppLayout>
+        <div className="flex h-full items-center justify-center">
+          <div className="text-center">
+            <p className="text-muted-foreground">Loading your dashboard...</p>
+          </div>
+        </div>
+      </AppLayout>
+    )
+  }
+
   return (
     <AppLayout>
       <div className="flex-1 space-y-8 p-4 md:p-8">
@@ -77,7 +90,7 @@ export default function DashboardPage() {
         <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
           <Card className="flex flex-col">
             <CardHeader className="flex-row items-start gap-4 space-y-0">
-              <div className="rounded-lg bg-red-500/10 p-3">
+              <div className="rounded-lg bg-red-100 p-3">
                 <CalendarDays className="h-6 w-6 text-red-500" />
               </div>
               <div className="flex-1">
@@ -101,7 +114,7 @@ export default function DashboardPage() {
 
           <Card className="flex flex-col">
             <CardHeader className="flex-row items-start gap-4 space-y-0">
-              <div className="rounded-lg bg-amber-500/10 p-3">
+              <div className="rounded-lg bg-amber-100 p-3">
                 <BookHeart className="h-6 w-6 text-amber-500" />
               </div>
               <div className="flex-1">
@@ -123,13 +136,13 @@ export default function DashboardPage() {
 
           <Card className="flex flex-col">
             <CardHeader className="flex-row items-start gap-4 space-y-0">
-              <div className="rounded-lg bg-teal-500/10 p-3">
+              <div className="rounded-lg bg-teal-100 p-3">
                 <Users className="h-6 w-6 text-teal-500" />
               </div>
               <div className="flex-1">
                 <CardTitle>Community</CardTitle>
                 <CardDescription>
-                  <Badge variant="outline" className="mr-2 border-accent text-accent">5 New Posts</Badge> 
+                  <Badge variant="outline" className="mr-2 border-teal-500 text-teal-500">5 New Posts</Badge>
                   Connect with others
                 </CardDescription>
               </div>
@@ -148,7 +161,7 @@ export default function DashboardPage() {
 
           <Card className="flex flex-col">
             <CardHeader className="flex-row items-start gap-4 space-y-0">
-              <div className="rounded-lg bg-rose-500/10 p-3">
+              <div className="rounded-lg bg-rose-100 p-3">
                 <HeartPulse className="h-6 w-6 text-rose-500" />
               </div>
               <div className="flex-1">
@@ -170,7 +183,7 @@ export default function DashboardPage() {
 
           <Card className="flex flex-col">
             <CardHeader className="flex-row items-start gap-4 space-y-0">
-              <div className="rounded-lg bg-green-500/10 p-3">
+              <div className="rounded-lg bg-green-100 p-3">
                 <Leaf className="h-6 w-6 text-green-500" />
               </div>
               <div className="flex-1">
@@ -192,21 +205,21 @@ export default function DashboardPage() {
 
           <Card className="flex flex-col">
             <CardHeader className="flex-row items-start gap-4 space-y-0">
-              <div className="rounded-lg bg-blue-500/10 p-3">
-                <Sparkles className="h-6 w-6 text-blue-500" />
+              <div className="rounded-lg bg-yellow-100 p-3">
+                <Award className="h-6 w-6 text-yellow-500" />
               </div>
               <div className="flex-1">
-                <CardTitle>Resource Library</CardTitle>
-                <CardDescription>12 curated articles</CardDescription>
+                <CardTitle>Success Stories</CardTitle>
+                <CardDescription>4 new stories this week</CardDescription>
               </div>
             </CardHeader>
             <CardContent className="flex-grow text-sm text-muted-foreground">
-              <p>Access curated articles, expert advice, and information to empower your journey.</p>
+              <p>Read inspiring stories of hope and perseverance from the community.</p>
             </CardContent>
             <CardFooter>
               <Button asChild className="w-full" variant="secondary">
-                <Link href="/resources">
-                  Explore Resources <ArrowRight className="ml-2 h-4 w-4" />
+                <Link href="/stories">
+                  Get Inspired <ArrowRight className="ml-2 h-4 w-4" />
                 </Link>
               </Button>
             </CardFooter>
