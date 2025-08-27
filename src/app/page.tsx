@@ -40,6 +40,7 @@ const getGreeting = () => {
 export default function DashboardPage() {
   const [greeting, setGreeting] = useState('')
   const [userName, setUserName] = useState('')
+  const [loading, setLoading] = useState(true)
   const router = useRouter()
 
   useEffect(() => {
@@ -47,23 +48,25 @@ export default function DashboardPage() {
       const { data: { user } } = await supabase.auth.getUser()
       if (!user) {
         router.push('/login')
-      } else {
-        const { data: profile, error } = await supabase
-          .from('profiles')
-          .select('full_name')
-          .eq('id', user.id)
-          .single()
-
-        if (profile) {
-          setUserName(profile.full_name?.split(' ')[0] || '')
-        }
+        return
       }
+      
+      const { data: profile, error } = await supabase
+        .from('profiles')
+        .select('full_name')
+        .eq('id', user.id)
+        .single()
+
+      if (profile) {
+        setUserName(profile.full_name?.split(' ')[0] || '')
+      }
+      setLoading(false)
     }
     fetchUser()
     setGreeting(getGreeting())
   }, [router])
 
-  if (!userName) {
+  if (loading) {
     return (
       <AppLayout>
         <div className="flex h-full items-center justify-center">
