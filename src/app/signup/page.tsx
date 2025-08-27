@@ -1,6 +1,6 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { useRouter } from 'next/navigation'
 import Link from 'next/link'
 import { supabase } from '@/lib/supabase'
@@ -32,6 +32,19 @@ export default function SignupPage() {
   const router = useRouter()
   const { toast } = useToast()
 
+  useEffect(() => {
+    const { data: authListener } = supabase.auth.onAuthStateChange((event, session) => {
+      if (event === 'SIGNED_IN') {
+        router.push('/')
+        router.refresh()
+      }
+    });
+
+    return () => {
+      authListener.subscription.unsubscribe();
+    };
+  }, [router]);
+
   const handleSignup = async (e: React.FormEvent) => {
     e.preventDefault()
     setLoading(true)
@@ -39,6 +52,11 @@ export default function SignupPage() {
     const { data: authData, error: authError } = await supabase.auth.signUp({
       email,
       password,
+      options: {
+        data: {
+          full_name: fullName,
+        }
+      }
     });
 
     if (authError) {
@@ -51,39 +69,21 @@ export default function SignupPage() {
       return;
     }
     
+    // The profile is now created via a trigger in Supabase, so we don't need to insert it here.
+    // However, we check if a session is active. If not, it means the user needs to confirm their email.
     if (authData.user) {
-        const { error: profileError } = await supabase
-          .from('profiles')
-          .insert({ id: authData.user.id, full_name: fullName })
-
-        if (profileError) {
-            setLoading(false)
-            // Note: In a real app, you might want to handle this failure more gracefully,
-            // perhaps by deleting the created user or asking them to try again.
-            toast({
-                title: 'Error creating profile',
-                description: profileError.message,
-                variant: 'destructive',
-            })
-            return
-        }
-
         if (!authData.session) {
+          setLoading(false);
           toast({
             title: 'Check your email',
             description: 'A confirmation link has been sent to your email address.',
           })
           router.push('/login')
-        } else {
-          toast({
-            title: 'Sign up successful!',
-            description: 'Redirecting to your dashboard...',
-          })
-          router.push('/')
-          router.refresh()
         }
+        // If session exists, onAuthStateChange will redirect to dashboard
+    } else {
+        setLoading(false)
     }
-     setLoading(false)
   }
 
   return (

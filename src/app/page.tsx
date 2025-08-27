@@ -38,16 +38,27 @@ const getGreeting = () => {
 
 export default function DashboardPage() {
   const [greeting, setGreeting] = useState('')
+  const [userName, setUserName] = useState('')
   const router = useRouter()
 
   useEffect(() => {
-    const checkUser = async () => {
+    const fetchUser = async () => {
       const { data: { user } } = await supabase.auth.getUser()
       if (!user) {
         router.push('/login')
+      } else {
+        const { data: profile, error } = await supabase
+          .from('profiles')
+          .select('full_name')
+          .eq('id', user.id)
+          .single()
+
+        if (profile) {
+          setUserName(profile.full_name?.split(' ')[0] || '')
+        }
       }
     }
-    checkUser()
+    fetchUser()
     setGreeting(getGreeting())
   }, [router])
 
@@ -56,7 +67,7 @@ export default function DashboardPage() {
       <div className="flex-1 space-y-8 p-4 md:p-8">
         <div className="space-y-2">
           <h1 className="text-4xl font-headline font-bold tracking-tight">
-            {greeting}
+            {greeting}{userName && `, ${userName}`}
           </h1>
           <p className="text-muted-foreground">
             A gentle space for your journey. Here are some tools to support you
@@ -95,7 +106,7 @@ export default function DashboardPage() {
               </div>
               <div className="flex-1">
                 <CardTitle>Private Journal</CardTitle>
-                <CardDescription>Last entry: 2 days ago</CardDescription>
+                <CardDescription>3 entries logged this month</CardDescription>
               </div>
             </CardHeader>
             <CardContent className="flex-grow text-sm text-muted-foreground">
@@ -118,7 +129,7 @@ export default function DashboardPage() {
               <div className="flex-1">
                 <CardTitle>Community</CardTitle>
                 <CardDescription>
-                  <Badge variant="outline" className="mr-2 border-accent text-accent">New</Badge> 
+                  <Badge variant="outline" className="mr-2 border-accent text-accent">5 New Posts</Badge> 
                   Connect with others
                 </CardDescription>
               </div>
