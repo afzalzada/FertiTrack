@@ -1,0 +1,16 @@
+{
+  "name": "FertiTrack",
+  "short_name": "FertiTrack",
+  "description": "An empathetic and discreet support app for couples navigating infertility.",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#F5F5DC",
+  "theme_color": "#A8D8B9",
+  "icons": [
+    {
+      "src": "/icon-512x512.png",
+      "sizes": "512x512",
+      "type": "image/png"
+    }
+  ]
+}
