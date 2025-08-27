@@ -150,9 +150,9 @@ export default function CommunityPage() {
                       </Avatar>
                       <div>
                         <p className="font-semibold">{post.author}</p>
-                        <p className="text-xs text-muted-foreground">
+                        <div className="text-xs text-muted-foreground">
                           {post.time} in <Badge variant="outline" className="text-xs">{post.topic}</Badge>
-                        </p>
+                        </div>
                       </div>
                     </div>
                   </CardHeader>
