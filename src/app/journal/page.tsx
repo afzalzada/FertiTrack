@@ -1,10 +1,16 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useMemo } from 'react'
 import { format } from 'date-fns'
 import { Lightbulb, PlusCircle } from 'lucide-react'
 import AppLayout from '@/components/layout/app-layout'
 import { Button } from '@/components/ui/button'
+import {
+  Accordion,
+  AccordionContent,
+  AccordionItem,
+  AccordionTrigger,
+} from '@/components/ui/accordion'
 import {
   Card,
   CardContent,
@@ -23,16 +29,39 @@ const prompts = [
   'Write a letter to your future self.',
   'What is one small thing you can do for yourself today?',
   'How has this journey changed your perspective on partnership?',
+  'What emotion is most present for you today? Describe it.',
+  'If you could give your past self one piece of advice, what would it be?',
+  'What are you proud of this week?',
+  'Describe a moment of peace you experienced recently.',
 ]
+
+// Simple hash function to get a number from a string
+const simpleHash = (str: string) => {
+  let hash = 0
+  for (let i = 0; i < str.length; i++) {
+    const char = str.charCodeAt(i)
+    hash = (hash << 5) - hash + char
+    hash |= 0 // Convert to 32bit integer
+  }
+  return Math.abs(hash)
+}
+
+const getDailyPrompt = () => {
+  const today = format(new Date(), 'yyyy-MM-dd')
+  const index = simpleHash(today) % prompts.length
+  return prompts[index]
+}
 
 const initialEntries = [
   {
     date: new Date(Date.now() - 86400000 * 2),
-    content: "Feeling a bit heavy today. The waiting is the hardest part. Trying to stay positive and focus on what I can control. We had a nice walk this evening which helped clear my head.",
+    content:
+      "Feeling a bit heavy today. The waiting is the hardest part. Trying to stay positive and focus on what I can control. We had a nice walk this evening which helped clear my head.",
   },
   {
     date: new Date(Date.now() - 86400000 * 5),
-    content: "Good news from the doctor today, which brought a wave of relief. It's a small step, but it feels monumental. Holding onto this feeling.",
+    content:
+      "Good news from the doctor today, which brought a wave of relief. It's a small step, but it feels monumental. Holding onto this feeling.",
   },
 ]
 
@@ -40,21 +69,22 @@ export default function JournalPage() {
   const [entries, setEntries] = useState(initialEntries)
   const [newEntry, setNewEntry] = useState('')
   const { toast } = useToast()
+  
+  const dailyPrompt = useMemo(() => getDailyPrompt(), [])
 
   const handleSaveEntry = () => {
     if (newEntry.trim()) {
       setEntries([{ date: new Date(), content: newEntry }, ...entries])
       setNewEntry('')
       toast({
-        title: "Entry saved",
-        description: "Your journal has been updated.",
+        title: 'Entry saved',
+        description: 'Your journal has been updated.',
       })
     }
   }
 
   const handlePrompt = () => {
-    const randomPrompt = prompts[Math.floor(Math.random() * prompts.length)]
-    setNewEntry(current => `${randomPrompt}\n\n${current}`)
+    setNewEntry(current => `${dailyPrompt}\n\n${current}`)
   }
 
   return (
@@ -89,7 +119,7 @@ export default function JournalPage() {
               <CardFooter className="justify-between">
                 <Button variant="ghost" onClick={handlePrompt}>
                   <Lightbulb className="mr-2 h-4 w-4" />
-                  Need a prompt?
+                  Use today's prompt
                 </Button>
                 <Button onClick={handleSaveEntry}>
                   <PlusCircle className="mr-2 h-4 w-4" />
@@ -101,31 +131,29 @@ export default function JournalPage() {
 
           <div className="space-y-6">
             <h2 className="text-2xl font-headline font-semibold">Past Entries</h2>
-            <div className="space-y-4">
-              {entries.length > 0 ? (
-                entries.map((entry, index) => (
-                  <Card key={index}>
-                    <CardHeader className="pb-2">
-                      <CardTitle className="text-lg">
-                        {format(entry.date, 'MMMM d, yyyy')}
-                      </CardTitle>
-                      <CardDescription>
-                        {format(entry.date, 'eeee')}
-                      </CardDescription>
-                    </CardHeader>
-                    <CardContent>
-                      <p className="text-sm text-muted-foreground line-clamp-3">
-                        {entry.content}
-                      </p>
-                    </CardContent>
-                  </Card>
-                ))
-              ) : (
-                <p className="text-sm text-muted-foreground">
-                  No past entries yet.
-                </p>
-              )}
-            </div>
+            {entries.length > 0 ? (
+              <Accordion type="single" collapsible className="w-full">
+                {entries.map((entry, index) => (
+                  <AccordionItem value={`item-${index}`} key={index}>
+                    <AccordionTrigger>
+                      <div className="text-left">
+                        <p className="font-semibold">{format(entry.date, 'MMMM d, yyyy')}</p>
+                        <p className="text-sm font-normal text-muted-foreground">
+                          {format(entry.date, 'eeee')}
+                        </p>
+                      </div>
+                    </AccordionTrigger>
+                    <AccordionContent>
+                      <p className="whitespace-pre-wrap text-muted-foreground">{entry.content}</p>
+                    </AccordionContent>
+                  </AccordionItem>
+                ))}
+              </Accordion>
+            ) : (
+              <p className="text-sm text-muted-foreground">
+                No past entries yet.
+              </p>
+            )}
           </div>
         </div>
       </div>

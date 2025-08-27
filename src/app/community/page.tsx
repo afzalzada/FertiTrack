@@ -151,7 +151,7 @@ export default function CommunityPage() {
                       <div>
                         <p className="font-semibold">{post.author}</p>
                         <div className="text-xs text-muted-foreground">
-                          {post.time} in <Badge variant="outline" className="text-xs">{post.topic}</Badge>
+                          {post.time} in <Badge variant="secondary" className="text-xs">{post.topic}</Badge>
                         </div>
                       </div>
                     </div>
@@ -170,7 +170,7 @@ export default function CommunityPage() {
                         <MessageSquare className="h-4 w-4" />
                         <span>{post.comments} Comments</span>
                       </button>
-                      <button className="flex items-center gap-1.5 hover:text-pink-500 transition-colors">
+                      <button className="flex items-center gap-1.5 hover:text-accent transition-colors">
                         <Heart className="h-4 w-4" />
                         <span>{post.likes} Likes</span>
                       </button>
