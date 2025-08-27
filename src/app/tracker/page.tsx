@@ -1,6 +1,6 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useEffect, useCallback } from 'react'
 import {
   BarChart,
   Bar,
@@ -18,16 +18,9 @@ import { Checkbox } from '@/components/ui/checkbox'
 import { Label } from '@/components/ui/label'
 import { Button } from '@/components/ui/button'
 import { useToast } from '@/hooks/use-toast'
-
-const moodData = [
-  { name: 'Mon', mood: 3 },
-  { name: 'Tue', mood: 4 },
-  { name: 'Wed', mood: 2 },
-  { name: 'Thu', mood: 5 },
-  { name: 'Fri', mood: 4 },
-  { name: 'Sat', mood: 3 },
-  { name: 'Sun', mood: 5 },
-]
+import { supabase } from '@/lib/supabase'
+import { format, subDays } from 'date-fns'
+import type { MoodLog } from '@/lib/database.types'
 
 const physicalSymptoms = ["Cramping", "Bloating", "Headache", "Fatigue", "Nausea", "Tender Breasts", "Spotting", "Backache"]
 const moodSymptoms = ["Anxious", "Irritable", "Sad", "Hopeful", "Calm", "Energetic", "Mood Swings", "Stressed"]
@@ -62,12 +55,86 @@ function CycleTracker() {
 
 export default function TrackerPage() {
   const { toast } = useToast()
+  const [moodData, setMoodData] = useState<{ name: string, mood: number }[]>([])
+  const [selectedPhysical, setSelectedPhysical] = useState<string[]>([])
+  const [selectedMood, setSelectedMood] = useState<string[]>([])
   
-  const handleSave = () => {
-    toast({
-      title: "Symptoms Logged",
-      description: "Your symptoms for today have been saved.",
-    })
+  const fetchMoodData = useCallback(async () => {
+    const { data: { user } } = await supabase.auth.getUser()
+    if (!user) return
+
+    const today = new Date()
+    const lastWeek = subDays(today, 6)
+    
+    const { data, error } = await supabase
+      .from('mood_logs')
+      .select('mood_level, log_date')
+      .eq('user_id', user.id)
+      .gte('log_date', format(lastWeek, 'yyyy-MM-dd'))
+      .lte('log_date', format(today, 'yyyy-MM-dd'))
+
+    if (error) {
+      toast({ title: 'Error fetching mood data', description: error.message, variant: 'destructive' })
+      return
+    }
+
+    const weeklyMood = Array.from({ length: 7 }).map((_, i) => {
+        const date = subDays(today, i);
+        const dayData = data.find(d => format(new Date(d.log_date), 'yyyy-MM-dd') === format(date, 'yyyy-MM-dd'))
+        return {
+            name: format(date, 'E'),
+            mood: dayData?.mood_level || 0
+        }
+    }).reverse();
+
+    setMoodData(weeklyMood)
+
+  }, [toast])
+
+  useEffect(() => {
+    fetchMoodData()
+  }, [fetchMoodData])
+
+
+  const handleSave = async () => {
+    const { data: { user } } = await supabase.auth.getUser()
+    if (!user) {
+        toast({ title: 'Not authenticated', description: 'Please log in to save your symptoms.', variant: 'destructive'})
+        return
+    }
+    
+    const today = format(new Date(), 'yyyy-MM-dd')
+    const allSymptoms = [...selectedPhysical, ...selectedMood]
+
+    const symptomLogs = allSymptoms.map(symptom => ({
+        user_id: user.id,
+        symptom,
+        log_date: today
+    }))
+
+    const { error } = await supabase.from('symptom_logs').insert(symptomLogs)
+
+    if (error) {
+        toast({ title: 'Error saving symptoms', description: error.message, variant: 'destructive' })
+    } else {
+        toast({
+          title: "Symptoms Logged",
+          description: "Your symptoms for today have been saved.",
+        })
+        setSelectedPhysical([])
+        setSelectedMood([])
+    }
+  }
+
+  const handleCheckboxChange = (symptom: string, type: 'physical' | 'mood') => {
+    const setter = type === 'physical' ? setSelectedPhysical : setSelectedMood
+    const list = type === 'physical' ? selectedPhysical : selectedMood
+
+    if (list.includes(symptom)) {
+        setter(list.filter(s => s !== symptom))
+    } else {
+        setter([...list, symptom])
+    }
   }
 
   return (
@@ -126,7 +193,11 @@ export default function TrackerPage() {
                         <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
                             {physicalSymptoms.map(symptom => (
                                 <div key={symptom} className="flex items-center space-x-2">
-                                    <Checkbox id={`phys-${symptom}`} />
+                                    <Checkbox 
+                                        id={`phys-${symptom}`} 
+                                        checked={selectedPhysical.includes(symptom)}
+                                        onCheckedChange={() => handleCheckboxChange(symptom, 'physical')}
+                                    />
                                     <Label htmlFor={`phys-${symptom}`}>{symptom}</Label>
                                 </div>
                             ))}
@@ -137,7 +208,11 @@ export default function TrackerPage() {
                         <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
                             {moodSymptoms.map(symptom => (
                                 <div key={symptom} className="flex items-center space-x-2">
-                                    <Checkbox id={`mood-${symptom}`} />
+                                    <Checkbox 
+                                        id={`mood-${symptom}`} 
+                                        checked={selectedMood.includes(symptom)}
+                                        onCheckedChange={() => handleCheckboxChange(symptom, 'mood')}
+                                    />
                                     <Label htmlFor={`mood-${symptom}`}>{symptom}</Label>
                                 </div>
                             ))}

@@ -1,6 +1,6 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useEffect, useCallback } from 'react'
 import AppLayout from '@/components/layout/app-layout'
 import {
   Card,
@@ -18,9 +18,14 @@ import {
   Heart,
   PlusCircle,
   Search,
+  Loader2,
 } from 'lucide-react'
 import { Input } from '@/components/ui/input'
 import { Badge } from '@/components/ui/badge'
+import { useToast } from '@/hooks/use-toast'
+import { supabase } from '@/lib/supabase'
+import { formatDistanceToNow } from 'date-fns'
+import type { PostWithAuthor } from '@/lib/database.types'
 
 const topics = [
   'General Discussion',
@@ -31,48 +36,72 @@ const topics = [
   'Partner Support',
 ]
 
-const posts = [
-  {
-    id: 1,
-    author: 'HopefulSoul',
-    avatar: 'https://i.pravatar.cc/150?u=a042581f4e29026704d',
-    time: '2 hours ago',
-    topic: 'IVF/IUI',
-    title: 'Feeling so anxious about our first IVF cycle. Any advice?',
-    content:
-      "We're starting our first round of IVF next week and I'm a bundle of nerves. I'm excited but also terrified. For those who've been through it, what do you wish you'd known beforehand? Any tips for managing the emotional and physical side effects?",
-    comments: 12,
-    likes: 34,
-  },
-  {
-    id: 2,
-    author: 'StrongerTogether',
-    avatar: 'https://i.pravatar.cc/150?u=a042581f4e29026704e',
-    time: '5 hours ago',
-    topic: 'Partner Support',
-    title: "How to best support my partner through this?",
-    content:
-      "As the non-carrying partner, I sometimes feel helpless. I want to be as supportive as possible, but I'm not always sure how. What are the most helpful things your partners have done for you during treatment? I'm open to any and all suggestions.",
-    comments: 8,
-    likes: 22,
-  },
-  {
-    id: 3,
-    author: 'PatientlyWaiting',
-    avatar: 'https://i.pravatar.cc/150?u=a042581f4e29026704f',
-    time: '1 day ago',
-    topic: 'Coping Strategies',
-    title: 'The two-week wait is driving me crazy.',
-    content:
-      "I'm in the middle of the TWW and every single twinge or lack thereof is sending me into a spiral. How do you all get through this period without losing your minds? I need some distraction ideas, please!",
-    comments: 25,
-    likes: 51,
-  },
-]
-
 export default function CommunityPage() {
+  const [posts, setPosts] = useState<PostWithAuthor[]>([])
+  const [loading, setLoading] = useState(true)
   const [newPostContent, setNewPostContent] = useState('')
+  const [newPostTitle, setNewPostTitle] = useState('')
   const [activeTopic, setActiveTopic] = useState('General Discussion')
+  const { toast } = useToast()
+
+  const fetchPosts = useCallback(async () => {
+    setLoading(true)
+    
+    let query = supabase
+      .from('posts')
+      .select(`
+        *,
+        author:profiles (full_name, avatar_url)
+      `)
+      .order('created_at', { ascending: false })
+
+    if (activeTopic !== 'General Discussion') {
+      query = query.eq('topic', activeTopic)
+    }
+
+    const { data, error } = await query
+
+    if (error) {
+      toast({ title: 'Error fetching posts', description: error.message, variant: 'destructive' })
+    } else {
+      setPosts(data as unknown as PostWithAuthor[] || [])
+    }
+    setLoading(false)
+  }, [activeTopic, toast])
+
+  useEffect(() => {
+    fetchPosts()
+  }, [fetchPosts])
+
+  const handleCreatePost = async () => {
+    if (!newPostTitle.trim() || !newPostContent.trim()) {
+        toast({ title: 'Incomplete Post', description: 'Please provide a title and content for your post.', variant: 'destructive'})
+        return
+    }
+
+    const { data: { user } } = await supabase.auth.getUser()
+    if (!user) {
+        toast({ title: 'Not authenticated', description: 'You must be logged in to create a post.', variant: 'destructive'})
+        return
+    }
+
+    const { error } = await supabase.from('posts').insert({
+        title: newPostTitle,
+        content: newPostContent,
+        topic: activeTopic,
+        author_id: user.id
+    })
+
+    if (error) {
+        toast({ title: 'Error creating post', description: error.message, variant: 'destructive'})
+    } else {
+        setNewPostTitle('')
+        setNewPostContent('')
+        toast({ title: 'Post created!', description: 'Your post has been shared with the community.'})
+        fetchPosts()
+    }
+  }
+
 
   return (
     <AppLayout>
@@ -93,7 +122,12 @@ export default function CommunityPage() {
                 <CardHeader>
                   <CardTitle>Create a Post</CardTitle>
                 </CardHeader>
-                <CardContent>
+                <CardContent className="space-y-4">
+                  <Input 
+                    placeholder="Post title..."
+                    value={newPostTitle}
+                    onChange={(e) => setNewPostTitle(e.target.value)}
+                  />
                   <Textarea
                     placeholder="Share what's on your mind..."
                     value={newPostContent}
@@ -102,7 +136,7 @@ export default function CommunityPage() {
                   />
                 </CardContent>
                 <CardFooter>
-                  <Button className="w-full">
+                  <Button className="w-full" onClick={handleCreatePost}>
                     <PlusCircle className="mr-2 h-4 w-4" />
                     Post
                   </Button>
@@ -138,47 +172,59 @@ export default function CommunityPage() {
               <Button variant="outline">Top</Button>
             </div>
             <div className="space-y-6">
-              {posts.map((post) => (
-                <Card key={post.id} className="overflow-hidden">
-                  <CardHeader className="p-4 bg-muted/50">
-                    <div className="flex items-center gap-3">
-                      <Avatar className="h-10 w-10">
-                        <AvatarImage src={post.avatar} alt={post.author} />
-                        <AvatarFallback>
-                          {post.author.charAt(0)}
-                        </AvatarFallback>
-                      </Avatar>
-                      <div>
-                        <p className="font-semibold">{post.author}</p>
-                        <div className="text-xs text-muted-foreground">
-                          {post.time} in <Badge variant="secondary" className="text-xs">{post.topic}</Badge>
+              {loading ? (
+                 <div className="flex items-center justify-center h-64 gap-2 text-muted-foreground">
+                    <Loader2 className="h-8 w-8 animate-spin" />
+                    <span>Loading posts...</span>
+                </div>
+              ) : posts.length > 0 ? (
+                posts.map((post) => (
+                  <Card key={post.id} className="overflow-hidden">
+                    <CardHeader className="p-4 bg-muted/50">
+                      <div className="flex items-center gap-3">
+                        <Avatar className="h-10 w-10">
+                          <AvatarImage src={post.author?.avatar_url || ''} alt={post.author?.full_name || 'User'} />
+                          <AvatarFallback>
+                            {post.author?.full_name?.charAt(0) || 'U'}
+                          </AvatarFallback>
+                        </Avatar>
+                        <div>
+                          <p className="font-semibold">{post.author?.full_name || 'Anonymous'}</p>
+                          <div className="text-xs text-muted-foreground">
+                            {formatDistanceToNow(new Date(post.created_at), { addSuffix: true })} in <Badge variant="secondary" className="text-xs">{post.topic}</Badge>
+                          </div>
                         </div>
                       </div>
-                    </div>
-                  </CardHeader>
-                  <CardContent className="p-4">
-                    <h3 className="mb-2 text-lg font-headline font-semibold">
-                      {post.title}
-                    </h3>
-                    <p className="text-sm text-muted-foreground line-clamp-3">
-                      {post.content}
-                    </p>
-                  </CardContent>
-                  <CardFooter className="flex justify-between p-4 bg-muted/50">
-                    <div className="flex gap-6 text-sm text-muted-foreground">
-                      <button className="flex items-center gap-1.5 hover:text-primary transition-colors">
-                        <MessageSquare className="h-4 w-4" />
-                        <span>{post.comments} Comments</span>
-                      </button>
-                      <button className="flex items-center gap-1.5 hover:text-accent transition-colors">
-                        <Heart className="h-4 w-4" />
-                        <span>{post.likes} Likes</span>
-                      </button>
-                    </div>
-                    <Button size="sm">Read More</Button>
-                  </CardFooter>
-                </Card>
-              ))}
+                    </CardHeader>
+                    <CardContent className="p-4">
+                      <h3 className="mb-2 text-lg font-headline font-semibold">
+                        {post.title}
+                      </h3>
+                      <p className="text-sm text-muted-foreground line-clamp-3">
+                        {post.content}
+                      </p>
+                    </CardContent>
+                    <CardFooter className="flex justify-between p-4 bg-muted/50">
+                      <div className="flex gap-6 text-sm text-muted-foreground">
+                        <button className="flex items-center gap-1.5 hover:text-primary transition-colors">
+                          <MessageSquare className="h-4 w-4" />
+                          <span>0 Comments</span>
+                        </button>
+                        <button className="flex items-center gap-1.5 hover:text-accent transition-colors">
+                          <Heart className="h-4 w-4" />
+                          <span>0 Likes</span>
+                        </button>
+                      </div>
+                      <Button size="sm">Read More</Button>
+                    </CardFooter>
+                  </Card>
+                ))
+              ) : (
+                <div className="text-center py-16 text-muted-foreground">
+                    <p>No posts in this topic yet.</p>
+                    <p className="text-sm">Be the first to share your story!</p>
+                </div>
+              )}
             </div>
           </main>
         </div>

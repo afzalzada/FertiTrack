@@ -1,8 +1,8 @@
 'use client'
 
-import { useState, useMemo } from 'react'
+import { useState, useMemo, useEffect, useCallback } from 'react'
 import { format } from 'date-fns'
-import { Lightbulb, PlusCircle } from 'lucide-react'
+import { Lightbulb, PlusCircle, Loader2 } from 'lucide-react'
 import AppLayout from '@/components/layout/app-layout'
 import { Button } from '@/components/ui/button'
 import {
@@ -21,6 +21,8 @@ import {
 } from '@/components/ui/card'
 import { Textarea } from '@/components/ui/textarea'
 import { useToast } from '@/hooks/use-toast'
+import { supabase } from '@/lib/supabase'
+import type { JournalEntry } from '@/lib/database.types'
 
 const prompts = [
   'What are you most grateful for today?',
@@ -52,34 +54,64 @@ const getDailyPrompt = () => {
   return prompts[index]
 }
 
-const initialEntries = [
-  {
-    date: new Date(Date.now() - 86400000 * 2),
-    content:
-      "Feeling a bit heavy today. The waiting is the hardest part. Trying to stay positive and focus on what I can control. We had a nice walk this evening which helped clear my head.",
-  },
-  {
-    date: new Date(Date.now() - 86400000 * 5),
-    content:
-      "Good news from the doctor today, which brought a wave of relief. It's a small step, but it feels monumental. Holding onto this feeling.",
-  },
-]
-
 export default function JournalPage() {
-  const [entries, setEntries] = useState(initialEntries)
+  const [entries, setEntries] = useState<JournalEntry[]>([])
   const [newEntry, setNewEntry] = useState('')
+  const [loading, setLoading] = useState(true)
   const { toast } = useToast()
   
   const dailyPrompt = useMemo(() => getDailyPrompt(), [])
 
-  const handleSaveEntry = () => {
-    if (newEntry.trim()) {
-      setEntries([{ date: new Date(), content: newEntry }, ...entries])
+  const fetchEntries = useCallback(async () => {
+    setLoading(true)
+    const { data: { user } } = await supabase.auth.getUser()
+    if (!user) {
+      setLoading(false)
+      return
+    }
+
+    const { data, error } = await supabase
+      .from('journal_entries')
+      .select('*')
+      .eq('user_id', user.id)
+      .order('created_at', { ascending: false })
+
+    if (error) {
+      toast({ title: 'Error fetching entries', description: error.message, variant: 'destructive' })
+    } else {
+      setEntries(data || [])
+    }
+    setLoading(false)
+  }, [toast])
+
+  useEffect(() => {
+    fetchEntries()
+  }, [fetchEntries])
+
+  const handleSaveEntry = async () => {
+    if (!newEntry.trim()) {
+      return
+    }
+
+    const { data: { user } } = await supabase.auth.getUser()
+    if (!user) {
+        toast({ title: 'Not authenticated', description: 'You must be logged in to save an entry.', variant: 'destructive'})
+        return
+    }
+
+    const { error } = await supabase
+      .from('journal_entries')
+      .insert({ content: newEntry, user_id: user.id })
+
+    if (error) {
+      toast({ title: 'Error saving entry', description: error.message, variant: 'destructive' })
+    } else {
       setNewEntry('')
       toast({
         title: 'Entry saved',
         description: 'Your journal has been updated.',
       })
+      fetchEntries()
     }
   }
 
@@ -131,15 +163,20 @@ export default function JournalPage() {
 
           <div className="space-y-6">
             <h2 className="text-2xl font-headline font-semibold">Past Entries</h2>
-            {entries.length > 0 ? (
+            {loading ? (
+              <div className="flex items-center gap-2 text-muted-foreground">
+                <Loader2 className="h-5 w-5 animate-spin" />
+                <span>Loading entries...</span>
+              </div>
+            ) : entries.length > 0 ? (
               <Accordion type="single" collapsible className="w-full">
                 {entries.map((entry, index) => (
-                  <AccordionItem value={`item-${index}`} key={index}>
+                  <AccordionItem value={`item-${index}`} key={entry.id}>
                     <AccordionTrigger>
                       <div className="text-left">
-                        <p className="font-semibold">{format(entry.date, 'MMMM d, yyyy')}</p>
+                        <p className="font-semibold">{format(new Date(entry.created_at), 'MMMM d, yyyy')}</p>
                         <p className="text-sm font-normal text-muted-foreground">
-                          {format(entry.date, 'eeee')}
+                          {format(new Date(entry.created_at), 'eeee')}
                         </p>
                       </div>
                     </AccordionTrigger>
