@@ -61,8 +61,8 @@ const DashboardPage = () => {
 
           <Card className="flex flex-col">
             <CardHeader className="flex-row items-start gap-4 space-y-0">
-              <div className="rounded-lg bg-primary/10 p-3">
-                <BookHeart className="h-6 w-6 text-primary" />
+              <div className="rounded-lg bg-rose-500/10 p-3">
+                <BookHeart className="h-6 w-6 text-rose-500" />
               </div>
               <div className="flex-1">
                 <CardTitle>Private Journal</CardTitle>
@@ -73,7 +73,7 @@ const DashboardPage = () => {
               <p>A secure space for your thoughts and feelings, with optional AI-powered insights.</p>
             </CardContent>
             <CardFooter>
-              <Button asChild className="w-full">
+              <Button asChild className="w-full" variant="secondary">
                 <Link href="/journal">
                   Write in Journal <ArrowRight className="ml-2 h-4 w-4" />
                 </Link>
@@ -83,13 +83,13 @@ const DashboardPage = () => {
 
           <Card className="flex flex-col">
             <CardHeader className="flex-row items-start gap-4 space-y-0">
-              <div className="rounded-lg bg-primary/10 p-3">
-                <Users className="h-6 w-6 text-primary" />
+              <div className="rounded-lg bg-teal-500/10 p-3">
+                <Users className="h-6 w-6 text-teal-500" />
               </div>
               <div className="flex-1">
                 <CardTitle>Community</CardTitle>
                 <CardDescription>
-                  <Badge variant="outline" className="mr-2 border-accent text-accent">New</Badge> 
+                  <Badge variant="outline" className="mr-2 border-accent-foreground text-accent-foreground">New</Badge> 
                   Connect with others
                 </CardDescription>
               </div>
@@ -98,7 +98,7 @@ const DashboardPage = () => {
               <p>Share experiences and find support in a safe, anonymous community forum.</p>
             </CardContent>
             <CardFooter>
-              <Button asChild className="w-full">
+              <Button asChild className="w-full" variant="secondary">
                 <Link href="/community">
                   Join Discussion <ArrowRight className="ml-2 h-4 w-4" />
                 </Link>
@@ -108,8 +108,8 @@ const DashboardPage = () => {
 
           <Card className="flex flex-col">
             <CardHeader className="flex-row items-start gap-4 space-y-0">
-              <div className="rounded-lg bg-primary/10 p-3">
-                <HeartPulse className="h-6 w-6 text-primary" />
+              <div className="rounded-lg bg-purple-500/10 p-3">
+                <HeartPulse className="h-6 w-6 text-purple-500" />
               </div>
               <div className="flex-1">
                 <CardTitle>Symptom Tracker</CardTitle>
@@ -120,7 +120,7 @@ const DashboardPage = () => {
               <p>Log physical and emotional symptoms to better understand your body's patterns.</p>
             </CardContent>
             <CardFooter>
-              <Button asChild className="w-full">
+              <Button asChild className="w-full" variant="secondary">
                 <Link href="/tracker">
                   Track Symptoms <ArrowRight className="ml-2 h-4 w-4" />
                 </Link>
@@ -130,8 +130,8 @@ const DashboardPage = () => {
 
           <Card className="flex flex-col">
             <CardHeader className="flex-row items-start gap-4 space-y-0">
-              <div className="rounded-lg bg-primary/10 p-3">
-                <Leaf className="h-6 w-6 text-primary" />
+              <div className="rounded-lg bg-green-500/10 p-3">
+                <Leaf className="h-6 w-6 text-green-500" />
               </div>
               <div className="flex-1">
                 <CardTitle>Mindfulness</CardTitle>
@@ -142,7 +142,7 @@ const DashboardPage = () => {
               <p>Find calm and center yourself with short, guided practices for stress relief.</p>
             </CardContent>
             <CardFooter>
-              <Button asChild className="w-full">
+              <Button asChild className="w-full" variant="secondary">
                 <Link href="/mindfulness">
                   Find Calm <ArrowRight className="ml-2 h-4 w-4" />
                 </Link>
@@ -152,8 +152,8 @@ const DashboardPage = () => {
 
           <Card className="flex flex-col">
             <CardHeader className="flex-row items-start gap-4 space-y-0">
-              <div className="rounded-lg bg-primary/10 p-3">
-                <Sparkles className="h-6 w-6 text-primary" />
+              <div className="rounded-lg bg-orange-500/10 p-3">
+                <Sparkles className="h-6 w-6 text-orange-500" />
               </div>
               <div className="flex-1">
                 <CardTitle>Resource Library</CardTitle>
@@ -164,7 +164,7 @@ const DashboardPage = () => {
               <p>Access curated articles, expert advice, and information to empower your journey.</p>
             </CardContent>
             <CardFooter>
-              <Button asChild className="w-full">
+              <Button asChild className="w-full" variant="secondary">
                 <Link href="/resources">
                   Explore Resources <ArrowRight className="ml-2 h-4 w-4" />
                 </Link>
