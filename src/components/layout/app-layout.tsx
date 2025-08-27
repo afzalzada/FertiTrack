@@ -12,6 +12,7 @@ import {
   Leaf,
   Sparkles,
   Menu,
+  Users,
 } from 'lucide-react'
 import { Logo } from '@/components/logo'
 import {
@@ -29,6 +30,7 @@ const navItems = [
   { href: '/tracker', label: 'Symptom Tracker', icon: HeartPulse },
   { href: '/mindfulness', label: 'Mindfulness', icon: Leaf },
   { href: '/resources', label: 'Resources', icon: BookOpen },
+  { href: '/community', label: 'Community', icon: Users },
   { href: '/support', label: 'AI Support', icon: Sparkles },
 ]
 
@@ -73,7 +75,7 @@ export default function AppLayout({ children }: { children: ReactNode }) {
                 <span className="sr-only">Toggle navigation menu</span>
               </Button>
             </SheetTrigger>
-            <SheetContent side="left" className="flex flex-col">
+            <SheetContent side="left" className="flex flex-col p-0">
                 <div className="flex h-14 items-center border-b px-4 lg:h-[60px] lg:px-4">
                   <Logo />
                 </div>
