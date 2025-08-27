@@ -29,13 +29,13 @@ const moodData = [
   { name: 'Sun', mood: 5 },
 ]
 
-const physicalSymptoms = ["Cramping", "Bloating", "Headache", "Fatigue", "Nausea", "Tender Breasts"]
-const moodSymptoms = ["Anxious", "Irritable", "Sad", "Hopeful", "Calm", "Energetic"]
+const physicalSymptoms = ["Cramping", "Bloating", "Headache", "Fatigue", "Nausea", "Tender Breasts", "Spotting", "Backache"]
+const moodSymptoms = ["Anxious", "Irritable", "Sad", "Hopeful", "Calm", "Energetic", "Mood Swings", "Stressed"]
 
 function CycleTracker() {
   const [day, setDay] = useState(14)
   const phase = day <= 5 ? "Menstruation" : day <= 14 ? "Follicular" : day <= 25 ? "Ovulatory" : "Luteal"
-  const phaseColor = phase === "Menstruation" ? "hsl(var(--destructive))" :
+  const phaseColor = phase === "Menstruation" ? "hsl(var(--chart-1))" :
                      phase === "Follicular" ? "hsl(var(--chart-4))" :
                      phase === "Ovulatory" ? "hsl(var(--chart-2))" :
                      "hsl(var(--chart-5))";
@@ -92,7 +92,7 @@ export default function TrackerPage() {
               <Card className="lg:col-span-3">
                 <CardHeader>
                   <CardTitle>Weekly Mood</CardTitle>
-                  <CardDescription>Your mood levels over the past week.</CardDescription>
+                  <CardDescription>Your mood levels over the past week (1-5).</CardDescription>
                 </CardHeader>
                 <CardContent>
                   <ResponsiveContainer width="100%" height={200}>
@@ -123,7 +123,7 @@ export default function TrackerPage() {
                 <CardContent className="space-y-6">
                     <div>
                         <h3 className="text-lg font-semibold mb-4 font-headline">Physical Symptoms</h3>
-                        <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
+                        <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
                             {physicalSymptoms.map(symptom => (
                                 <div key={symptom} className="flex items-center space-x-2">
                                     <Checkbox id={`phys-${symptom}`} />
@@ -134,7 +134,7 @@ export default function TrackerPage() {
                     </div>
                      <div>
                         <h3 className="text-lg font-semibold mb-4 font-headline">Mood & Emotions</h3>
-                        <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
+                        <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
                             {moodSymptoms.map(symptom => (
                                 <div key={symptom} className="flex items-center space-x-2">
                                     <Checkbox id={`mood-${symptom}`} />

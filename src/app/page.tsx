@@ -47,7 +47,6 @@ export default function DashboardPage() {
       const { data: { user } } = await supabase.auth.getUser()
       if (!user) {
         router.push('/login')
-        setLoading(false)
         return
       }
       
@@ -62,8 +61,22 @@ export default function DashboardPage() {
       }
       setLoading(false)
     }
+
+    const { data: authListener } = supabase.auth.onAuthStateChange(
+      (event, session) => {
+        if (event === 'SIGNED_IN') {
+          fetchUser();
+        }
+      }
+    );
+
     fetchUser()
     setGreeting(getGreeting())
+    
+    return () => {
+      authListener.subscription.unsubscribe();
+    };
+
   }, [router])
 
   if (loading) {
@@ -93,8 +106,8 @@ export default function DashboardPage() {
         <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
           <Card className="flex flex-col">
             <CardHeader className="flex-row items-start gap-4 space-y-0">
-              <div className="flex h-12 w-12 items-center justify-center rounded-full bg-red-100 dark:bg-red-900/30">
-                <CalendarDays className="h-6 w-6 text-red-500" />
+              <div className="flex h-12 w-12 items-center justify-center rounded-full bg-rose-100 dark:bg-rose-900/30">
+                <CalendarDays className="h-6 w-6 text-rose-500" />
               </div>
               <div className="flex-1">
                 <CardTitle>Shared Calendar</CardTitle>
@@ -122,14 +135,14 @@ export default function DashboardPage() {
               </div>
               <div className="flex-1">
                 <CardTitle>Private Journal</CardTitle>
-                <CardDescription>3 entries logged this month</CardDescription>
+                <CardDescription>2 entries logged this month</CardDescription>
               </div>
             </CardHeader>
             <CardContent className="flex-grow text-sm text-muted-foreground">
               <p>A secure space for your thoughts and feelings, with optional AI-powered insights.</p>
             </CardContent>
             <CardFooter>
-              <Button asChild className="w-full" variant="secondary">
+              <Button asChild className="w-full" variant="outline">
                 <Link href="/journal">
                   Write in Journal <ArrowRight className="ml-2 h-4 w-4" />
                 </Link>
@@ -145,7 +158,7 @@ export default function DashboardPage() {
               <div className="flex-1">
                 <CardTitle>Community</CardTitle>
                 <CardDescription>
-                  <Badge variant="outline" className="mr-2 border-teal-500 text-teal-500">5 New Posts</Badge>
+                  <Badge variant="outline" className="mr-2 border-teal-500 text-teal-500">3 New Posts</Badge>
                   Connect with others
                 </CardDescription>
               </div>
@@ -154,7 +167,7 @@ export default function DashboardPage() {
               <p>Share experiences and find support in a safe, anonymous community forum.</p>
             </CardContent>
             <CardFooter>
-              <Button asChild className="w-full" variant="secondary">
+              <Button asChild className="w-full" variant="outline">
                 <Link href="/community">
                   Join Discussion <ArrowRight className="ml-2 h-4 w-4" />
                 </Link>
@@ -164,8 +177,8 @@ export default function DashboardPage() {
 
           <Card className="flex flex-col">
             <CardHeader className="flex-row items-start gap-4 space-y-0">
-              <div className="flex h-12 w-12 items-center justify-center rounded-full bg-rose-100 dark:bg-rose-900/30">
-                <HeartPulse className="h-6 w-6 text-rose-500" />
+              <div className="flex h-12 w-12 items-center justify-center rounded-full bg-pink-100 dark:bg-pink-900/30">
+                <HeartPulse className="h-6 w-6 text-pink-500" />
               </div>
               <div className="flex-1">
                 <CardTitle>Symptom Tracker</CardTitle>
@@ -176,7 +189,7 @@ export default function DashboardPage() {
               <p>Log physical and emotional symptoms to better understand your body's patterns.</p>
             </CardContent>
             <CardFooter>
-              <Button asChild className="w-full" variant="secondary">
+              <Button asChild className="w-full" variant="outline">
                 <Link href="/tracker">
                   Track Symptoms <ArrowRight className="ml-2 h-4 w-4" />
                 </Link>
@@ -198,7 +211,7 @@ export default function DashboardPage() {
               <p>Find calm and center yourself with short, guided practices for stress relief.</p>
             </CardContent>
             <CardFooter>
-              <Button asChild className="w-full" variant="secondary">
+              <Button asChild className="w-full" variant="outline">
                 <Link href="/mindfulness">
                   Find Calm <ArrowRight className="ml-2 h-4 w-4" />
                 </Link>
@@ -220,7 +233,7 @@ export default function DashboardPage() {
               <p>Read inspiring stories of hope and perseverance from the community.</p>
             </CardContent>
             <CardFooter>
-              <Button asChild className="w-full" variant="secondary">
+              <Button asChild className="w-full" variant="outline">
                 <Link href="/stories">
                   Get Inspired <ArrowRight className="ml-2 h-4 w-4" />
                 </Link>

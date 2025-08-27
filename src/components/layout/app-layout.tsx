@@ -16,6 +16,7 @@ import {
   Menu,
   Users,
   Award,
+  Gem,
 } from 'lucide-react'
 import { Logo } from '@/components/logo'
 import {
@@ -29,14 +30,15 @@ import { supabase } from '@/lib/supabase'
 
 const navItems = [
   { href: '/', label: 'Dashboard', icon: LayoutDashboard, color: 'text-sky-500' },
-  { href: '/calendar', label: 'Calendar', icon: CalendarDays, color: 'text-red-500' },
+  { href: '/calendar', label: 'Calendar', icon: CalendarDays, color: 'text-rose-500' },
   { href: '/journal', label: 'Journal', icon: BookHeart, color: 'text-amber-500' },
-  { href: '/tracker', label: 'Symptom Tracker', icon: HeartPulse, color: 'text-rose-500' },
+  { href: '/tracker', label: 'Symptom Tracker', icon: HeartPulse, color: 'text-pink-500' },
   { href: '/mindfulness', label: 'Mindfulness', icon: Leaf, color: 'text-green-500' },
   { href: '/resources', label: 'Resources', icon: BookOpen, color: 'text-blue-500' },
   { href: '/community', label: 'Community', icon: Users, color: 'text-teal-500' },
   { href: '/stories', label: 'Success Stories', icon: Award, color: 'text-yellow-500' },
   { href: '/support', label: 'AI Support', icon: Sparkles, color: 'text-indigo-500' },
+  { href: '/pricing', label: 'Upgrade', icon: Gem, color: 'text-violet-500' },
 ]
 
 export default function AppLayout({ children }: { children: ReactNode }) {
