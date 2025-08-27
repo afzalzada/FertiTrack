@@ -25,6 +25,7 @@ const isSupabaseConnected =
   !process.env.NEXT_PUBLIC_SUPABASE_URL.includes('dummy')
 
 export default function SignupPage() {
+  const [fullName, setFullName] = useState('')
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
   const [loading, setLoading] = useState(false)
@@ -34,35 +35,55 @@ export default function SignupPage() {
   const handleSignup = async (e: React.FormEvent) => {
     e.preventDefault()
     setLoading(true)
-    const {
-      data: { session },
-      error,
-    } = await supabase.auth.signUp({
+    
+    const { data: authData, error: authError } = await supabase.auth.signUp({
       email,
       password,
-    })
-    setLoading(false)
+    });
 
-    if (error) {
+    if (authError) {
+      setLoading(false)
       toast({
         title: 'Error signing up',
-        description: error.message,
+        description: authError.message,
         variant: 'destructive',
       })
-    } else if (!session) {
-      toast({
-        title: 'Check your email',
-        description: 'A confirmation link has been sent to your email address.',
-      })
-      router.push('/login')
-    } else {
-       toast({
-        title: 'Sign up successful!',
-        description: 'Redirecting to your dashboard...',
-      })
-      router.push('/')
-      router.refresh()
+      return;
     }
+    
+    if (authData.user) {
+        const { error: profileError } = await supabase
+          .from('profiles')
+          .insert({ id: authData.user.id, full_name: fullName })
+
+        if (profileError) {
+            setLoading(false)
+            // Note: In a real app, you might want to handle this failure more gracefully,
+            // perhaps by deleting the created user or asking them to try again.
+            toast({
+                title: 'Error creating profile',
+                description: profileError.message,
+                variant: 'destructive',
+            })
+            return
+        }
+
+        if (!authData.session) {
+          toast({
+            title: 'Check your email',
+            description: 'A confirmation link has been sent to your email address.',
+          })
+          router.push('/login')
+        } else {
+          toast({
+            title: 'Sign up successful!',
+            description: 'Redirecting to your dashboard...',
+          })
+          router.push('/')
+          router.refresh()
+        }
+    }
+     setLoading(false)
   }
 
   return (
@@ -74,7 +95,7 @@ export default function SignupPage() {
           </div>
           <CardTitle className="text-2xl font-headline">Create an Account</CardTitle>
           <CardDescription>
-            Enter your email and password to get started.
+            Enter your details below to get started.
           </CardDescription>
         </CardHeader>
         <CardContent>
@@ -88,6 +109,18 @@ export default function SignupPage() {
             </Alert>
           )}
           <form onSubmit={handleSignup} className="space-y-4">
+            <div className="space-y-2">
+              <Label htmlFor="full-name">Full Name</Label>
+              <Input
+                id="full-name"
+                type="text"
+                placeholder="Jane Doe"
+                required
+                value={fullName}
+                onChange={(e) => setFullName(e.target.value)}
+                disabled={loading || !isSupabaseConnected}
+              />
+            </div>
             <div className="space-y-2">
               <Label htmlFor="email">Email</Label>
               <Input
