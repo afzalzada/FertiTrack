@@ -105,22 +105,8 @@ export default function SupportPage() {
                 </Alert>
               )}
               {result && (
-                <div className="prose prose-sm max-w-none text-foreground prose-headings:text-foreground prose-strong:text-foreground">
-                  {result.insights.split('\n').map((line, index) => {
-                     if (line.startsWith('### ')) {
-                        return <h3 key={index} className="text-lg font-headline font-semibold mt-4 mb-2">{line.substring(4)}</h3>
-                    }
-                    if (line.startsWith('## ')) {
-                        return <h2 key={index} className="text-xl font-headline font-bold mt-6 mb-3">{line.substring(3)}</h2>
-                    }
-                     if (line.startsWith('# ')) {
-                        return <h1 key={index} className="text-2xl font-headline font-extrabold mt-8 mb-4">{line.substring(2)}</h1>
-                    }
-                    if (line.startsWith('* ')) {
-                       return <p key={index} className="flex items-start"><span className="mr-2 mt-1.5 text-primary">&#8226;</span><span>{line.substring(2)}</span></p>
-                    }
-                    return <p key={index} className="mb-2">{line}</p>
-                  })}
+                <div className="prose prose-sm max-w-none">
+                  {result.insights}
                 </div>
               )}
                {!loading && !result && !error && (
