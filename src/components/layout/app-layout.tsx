@@ -1,3 +1,4 @@
+
 'use client'
 
 import Link from 'next/link'
@@ -22,6 +23,7 @@ import { Logo } from '@/components/logo'
 import {
   Sheet,
   SheetContent,
+  SheetTitle,
   SheetTrigger,
 } from '@/components/ui/sheet'
 import { Button } from '@/components/ui/button'
@@ -95,6 +97,7 @@ export default function AppLayout({ children }: { children: ReactNode }) {
               </Button>
             </SheetTrigger>
             <SheetContent side="left" className="flex flex-col p-0">
+              <SheetTitle className="sr-only">Navigation Menu</SheetTitle>
                 <div className="flex h-14 items-center border-b px-4 lg:h-[60px] lg:px-4">
                   <Logo />
                 </div>
