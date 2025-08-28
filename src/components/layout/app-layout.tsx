@@ -31,7 +31,7 @@ import { ScrollArea } from '@/components/ui/scroll-area'
 import { supabase } from '@/lib/supabase'
 
 const navItems = [
-  { href: '/', label: 'Dashboard', icon: LayoutDashboard, color: 'text-sky-500' },
+  { href: '/dashboard', label: 'Dashboard', icon: LayoutDashboard, color: 'text-sky-500' },
   { href: '/calendar', label: 'Calendar', icon: CalendarDays, color: 'text-rose-500' },
   { href: '/journal', label: 'Journal', icon: BookHeart, color: 'text-amber-500' },
   { href: '/tracker', label: 'Symptom Tracker', icon: HeartPulse, color: 'text-pink-500' },

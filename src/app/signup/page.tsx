@@ -1,3 +1,4 @@
+
 'use client'
 
 import { useState, useEffect } from 'react'
@@ -35,7 +36,7 @@ export default function SignupPage() {
   useEffect(() => {
     const { data: authListener } = supabase.auth.onAuthStateChange((event, session) => {
       if (event === 'SIGNED_IN') {
-        router.push('/')
+        router.push('/dashboard')
         router.refresh()
       }
     });

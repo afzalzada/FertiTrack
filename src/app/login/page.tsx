@@ -1,3 +1,4 @@
+
 'use client'
 
 import { useState } from 'react'
@@ -51,7 +52,7 @@ export default function LoginPage() {
         title: 'Login successful',
         description: 'Redirecting to your dashboard...',
       })
-      router.push('/')
+      router.push('/dashboard')
       router.refresh()
     }
   }
