@@ -56,7 +56,7 @@ export default function DashboardPage() {
         .eq('id', user.id)
         .single()
 
-      if (profile) {
+      if (profile?.full_name) {
         setUserName(profile.full_name?.split(' ')[0] || '')
       }
       setLoading(false)
@@ -64,8 +64,11 @@ export default function DashboardPage() {
 
     const { data: authListener } = supabase.auth.onAuthStateChange(
       (event, session) => {
-        if (event === 'SIGNED_IN') {
+        if (event === 'SIGNED_IN' || event === 'INITIAL_SESSION') {
           fetchUser();
+        }
+        if(event === 'SIGNED_OUT'){
+          router.push('/login')
         }
       }
     );
@@ -99,15 +102,14 @@ export default function DashboardPage() {
             {greeting}{userName && `, ${userName}`}
           </h1>
           <p className="text-muted-foreground">
-            A gentle space for your journey. Here are some tools to support you
-            today.
+            A gentle space for your journey together. Here are some tools to support you today.
           </p>
         </div>
         <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
           <Card className="flex flex-col">
             <CardHeader className="flex-row items-start gap-4 space-y-0">
-              <div className="flex h-12 w-12 items-center justify-center rounded-full bg-rose-100 dark:bg-rose-900/30">
-                <CalendarDays className="h-6 w-6 text-rose-500" />
+              <div className="flex h-12 w-12 items-center justify-center rounded-full bg-primary/10">
+                <CalendarDays className="h-6 w-6 text-primary" />
               </div>
               <div className="flex-1">
                 <CardTitle>Shared Calendar</CardTitle>
@@ -130,8 +132,8 @@ export default function DashboardPage() {
 
           <Card className="flex flex-col">
             <CardHeader className="flex-row items-start gap-4 space-y-0">
-               <div className="flex h-12 w-12 items-center justify-center rounded-full bg-amber-100 dark:bg-amber-900/30">
-                <BookHeart className="h-6 w-6 text-amber-500" />
+               <div className="flex h-12 w-12 items-center justify-center rounded-full bg-primary/10">
+                <BookHeart className="h-6 w-6 text-primary" />
               </div>
               <div className="flex-1">
                 <CardTitle>Private Journal</CardTitle>
@@ -152,13 +154,13 @@ export default function DashboardPage() {
 
           <Card className="flex flex-col">
             <CardHeader className="flex-row items-start gap-4 space-y-0">
-              <div className="flex h-12 w-12 items-center justify-center rounded-full bg-teal-100 dark:bg-teal-900/30">
-                <Users className="h-6 w-6 text-teal-500" />
+              <div className="flex h-12 w-12 items-center justify-center rounded-full bg-primary/10">
+                <Users className="h-6 w-6 text-primary" />
               </div>
               <div className="flex-1">
                 <CardTitle>Community</CardTitle>
                 <CardDescription>
-                  <Badge variant="outline" className="mr-2 border-teal-500 text-teal-500">3 New Posts</Badge>
+                  <Badge variant="outline" className="mr-2">3 New Posts</Badge>
                   Connect with others
                 </CardDescription>
               </div>
@@ -177,8 +179,8 @@ export default function DashboardPage() {
 
           <Card className="flex flex-col">
             <CardHeader className="flex-row items-start gap-4 space-y-0">
-              <div className="flex h-12 w-12 items-center justify-center rounded-full bg-pink-100 dark:bg-pink-900/30">
-                <HeartPulse className="h-6 w-6 text-pink-500" />
+              <div className="flex h-12 w-12 items-center justify-center rounded-full bg-primary/10">
+                <HeartPulse className="h-6 w-6 text-primary" />
               </div>
               <div className="flex-1">
                 <CardTitle>Symptom Tracker</CardTitle>
@@ -199,8 +201,8 @@ export default function DashboardPage() {
 
           <Card className="flex flex-col">
             <CardHeader className="flex-row items-start gap-4 space-y-0">
-              <div className="flex h-12 w-12 items-center justify-center rounded-full bg-green-100 dark:bg-green-900/30">
-                <Leaf className="h-6 w-6 text-green-500" />
+              <div className="flex h-12 w-12 items-center justify-center rounded-full bg-primary/10">
+                <Leaf className="h-6 w-6 text-primary" />
               </div>
               <div className="flex-1">
                 <CardTitle>Mindfulness</CardTitle>
@@ -221,8 +223,8 @@ export default function DashboardPage() {
 
           <Card className="flex flex-col">
             <CardHeader className="flex-row items-start gap-4 space-y-0">
-              <div className="flex h-12 w-12 items-center justify-center rounded-full bg-yellow-100 dark:bg-yellow-900/30">
-                <Award className="h-6 w-6 text-yellow-500" />
+              <div className="flex h-12 w-12 items-center justify-center rounded-full bg-primary/10">
+                <Award className="h-6 w-6 text-primary" />
               </div>
               <div className="flex-1">
                 <CardTitle>Success Stories</CardTitle>
