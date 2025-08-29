@@ -151,7 +151,7 @@ export default function SignupPage() {
               {loading ? 'Creating account...' : 'Create Account'}
             </Button>
           </form>
-        </CardContent>
+        </-content>
         <div className="mb-6 mt-4 text-center text-sm">
           Already have an account?{' '}
           <Link href="/login" className="underline hover:text-primary">
